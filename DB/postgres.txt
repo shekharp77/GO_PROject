@@ -1,0 +1,34 @@
+package DBConnection
+
+import (
+	"database/sql"
+    "log"
+	_ "github.com/lib/pq"
+	"fmt"
+)
+
+func Postgres() {
+	connStr := "user=pqgotest dbname=pqgotest sslmode=verify-full"
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	age := 21
+	rows, err := db.Query("SELECT name FROM users WHERE age = $1", age)
+    fmt.Println(rows)
+
+
+    // disable - No SSL
+    // require - Always SSL (skip verification)
+    // verify-ca - Always SSL (verify that the certificate presented by the
+    // server was signed by a trusted CA)
+    // verify-full - Always SSL (verify that the certification presented by
+    // the server was signed by a trusted CA and the server host name
+    // matches the one in the certificate)
+
+    var userid int
+    _ := db.QueryRow(`INSERT INTO users(name, favorite_fruit, age)
+    	VALUES('beatrice', 'starfruit', 93) RETURNING id`).Scan(&userid)
+
+}
